@@ -191,12 +191,19 @@ def requirement4(host, user, password):
 # TODO: REPLACE THE VALUES OF FOLLOWING VARIABLES
 host = 'localhost'
 user = 'root'
-password = ''
+pwpath = os.path.join(BASE_DIR, 'password.txt')
+
+if os.path.exists(pwpath):
+    with open(pwpath, 'r') as f:
+        password = f.read().strip()
+else:
+    password = ''
+
 directory_in = 'dataset/'
 
 
 requirement1(host=host, user=user, password=password)
-# requirement2(host=host, user=user, password=password)
-# requirement3(host=host, user=user, password=password, directory=directory_in)
+requirement2(host=host, user=user, password=password)
+requirement3(host=host, user=user, password=password, directory=directory_in)
 requirement4(host=host, user=user, password=password)
 print('Done!')
