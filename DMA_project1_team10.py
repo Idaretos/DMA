@@ -31,7 +31,7 @@ def requirement2(host, user, password):
 
     cursor.execute('CREATE TABLE IF NOT EXISTS Category (\
                    category_id INT(11) PRIMARY KEY, \
-                   name VARCHAR(255) NOT NULL) \
+                   name VARCHAR(255) NOT NULL, \
                    num_restaurants INT(11) DEFAULT 0);')
     
     cursor.execute('CREATE TABLE IF NOT EXISTS Collection (\
@@ -51,7 +51,7 @@ def requirement2(host, user, password):
                    restaurant VARCHAR(255), \
                    PRIMARY KEY (menu_name, restaurant));')
     
-    cursor.execute('CREATE TABLE IF NOT EXISTS Post_Menu (\
+    cursor.execute('CREATE TABLE IF NOT EXISTS Restaurant_Post (\
                    post_id INT(11), \
                    menu_name VARCHAR(255), \
                    restaurant VARCHAR(255), \
@@ -98,6 +98,44 @@ def requirement2(host, user, password):
                    num_collections INT(11) DEFAULT 0, \
                    mean_review_score DECIMAL(11) DEFAULT 0);')
 
+    # Triggers for derived attributes
+    cursor.execute('CREATE TRIGGER update_num_restaurants_category \
+                   AFTER INSERT ON Restaurant \
+                   FOR EACH ROW \
+                   BEGIN \
+                       UPDATE Category \
+                       SET num_restaurants = num_restaurants + 1 \
+                       WHERE category_id = NEW.category; \
+                   END')
+    
+    cursor.execute('CREATE TRIGGER update_num_restaurants_location \
+                   AFTER INSERT ON Restaurant \
+                   FOR EACH ROW \
+                   BEGIN \
+                       UPDATE Location \
+                       SET num_restaurants = num_restaurants + 1 \
+                       WHERE location_id = NEW.location; \
+                   END')
+    
+    cursor.execute('CREATE TRIGGER update_num_reviews_restaurant \
+                   AFTER INSERT ON Review \
+                   FOR EACH ROW \
+                   BEGIN \
+                       UPDATE Restaurant \
+                       SET num_reviews = num_reviews + 1, \
+                           mean_review_score = (mean_review_score * num_reviews + NEW.total_score) / (num_reviews + 1) \
+                       WHERE restaurant_id = NEW.restaurant; \
+                   END')
+    
+    cursor.execute('CREATE TRIGGER update_num_collections_user \
+                   AFTER INSERT ON Collection \
+                   FOR EACH ROW \
+                   BEGIN \
+                       UPDATE User \
+                       SET num_collections = num_collections + 1 \
+                       WHERE user_id = NEW.user_id; \
+                   END')
+
     cursor.close()
 
 
@@ -117,6 +155,22 @@ def requirement3(host, user, password, directory):
         next(reader)
         for row in reader:
             cursor.execute('INSERT INTO Category (name, category_id) VALUES (%s, %s);', row)
+    with open(directory + 'Location.csv', 'r') as f:
+        reader = csv.reader(f)
+        next(reader)
+        for row in reader:
+            cursor.execute('INSERT INTO Location (name, location_id) VALUES (%s, %s);', row)
+    with open(directory + 'User.csv', 'r') as f:
+        reader = csv.reader(f)
+        next(reader)
+        for row in reader:
+            cursor.execute('INSERT INTO User (user_id, user_name, region) VALUES (%s, %s, %s);', row)
+    with open(directory + 'Restaurant.csv', 'r') as f:
+        reader = csv.reader(f)
+        next(reader)
+        for row in reader:
+            cursor.execute('INSERT INTO Restaurant (restaurant_id, restaurant_name, lunch_price_min, lunch_price_max, dinner_price_min, dinner_price_max, location, category) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);', row)
+    
     with open(directory + 'Collection.csv', 'r') as f:
         reader = csv.reader(f)
         next(reader)
@@ -127,11 +181,11 @@ def requirement3(host, user, password, directory):
         next(reader)
         for row in reader:
             cursor.execute('INSERT INTO Follow (followee_id, follower_id) VALUES (%s, %s);', row)
-    with open(directory + 'Location.csv', 'r') as f:
+    with open(directory + 'Review.csv', 'r') as f:
         reader = csv.reader(f)
         next(reader)
         for row in reader:
-            cursor.execute('INSERT INTO Location (name, location_id) VALUES (%s, %s);', row)
+            cursor.execute('INSERT INTO Review (review_id, review_content, reg_date, user_id, total_score, taste_score, service_score, mood_score, restaurant) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);', row)
     with open(directory + 'Menu.csv', 'r') as f:
         reader = csv.reader(f)
         next(reader)
@@ -139,31 +193,17 @@ def requirement3(host, user, password, directory):
             price_min = row[1] if len(row[1]) else None  # Assign a default value of 0.0 if 'price_min' is empty
             price_max = row[2] if len(row[2]) else None  # Assign a default value of 0.0 if 'price_max' is empty
             cursor.execute('INSERT INTO Menu (menu_name, price_min, price_max, restaurant) VALUES (%s, %s, %s, %s);', (row[0], price_min, price_max, row[3]))
-    with open(directory + 'Post_Menu.csv', 'r') as f:
-        reader = csv.reader(f)
-        next(reader)
-        for row in reader:
-            cursor.execute('INSERT INTO Post_Menu (post_id, menu_name, restaurant) VALUES (%s, %s, %s);', row)
+    
     with open(directory + 'Post.csv', 'r') as f:
         reader = csv.reader(f)
         next(reader)
         for row in reader:
             cursor.execute('INSERT INTO Post (blog_title, blog_URL, post_date, restaurant, post_id) VALUES (%s, %s, %s, %s, %s);', row)
-    with open(directory + 'Restaurant.csv', 'r') as f:
+    with open(directory + 'Post_Menu.csv', 'r') as f:
         reader = csv.reader(f)
         next(reader)
         for row in reader:
-            cursor.execute('INSERT INTO Restaurant (restaurant_id, restaurant_name, lunch_price_min, lunch_price_max, dinner_price_min, dinner_price_max, location, category) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);', row)
-    with open(directory + 'Review.csv', 'r') as f:
-        reader = csv.reader(f)
-        next(reader)
-        for row in reader:
-            cursor.execute('INSERT INTO Review (review_id, review_content, reg_date, user_id, total_score, taste_score, service_score, mood_score, restaurant) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);', row)
-    with open(directory + 'User.csv', 'r') as f:
-        reader = csv.reader(f)
-        next(reader)
-        for row in reader:
-            cursor.execute('INSERT INTO User (user_id, user_name, region) VALUES (%s, %s, %s);', row)
+            cursor.execute('INSERT INTO Restaurant_Post (post_id, menu_name, restaurant) VALUES (%s, %s, %s);', row)
 
     cursor.close()
 
