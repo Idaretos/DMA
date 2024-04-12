@@ -28,37 +28,42 @@ def requirement2(host, user, password):
     print('Creating tables...')
 
     cursor.execute(f'USE DMA_team{str(team)};')
+
     cursor.execute('CREATE TABLE IF NOT EXISTS Category (\
                    category_id INT(11) PRIMARY KEY, \
-                   name VARCHAR(255) NOT NULL);')
+                   name VARCHAR(255) NOT NULL) \
+                   num_restaurants INT(11) DEFAULT 0);')
+    
     cursor.execute('CREATE TABLE IF NOT EXISTS Collection (\
                    user_id VARCHAR(255), \
                    restaurant_id VARCHAR(255), \
                    PRIMARY KEY (user_id, restaurant_id));')
-    cursor.execute('CREATE TABLE IF NOT EXISTS Follow (\
-                   follower_id VARCHAR(255), \
-                   followee_id VARCHAR(255), \
-                   PRIMARY KEY (follower_id, followee_id));')
+    
     cursor.execute('CREATE TABLE IF NOT EXISTS Location (\
                    location_id INT(11) PRIMARY KEY, \
-                   name VARCHAR(255) NOT NULL);')
+                   name VARCHAR(255) NOT NULL, \
+                   num_restaurants INT(11) DEFAULT 0);')
+    
     cursor.execute('CREATE TABLE IF NOT EXISTS Menu (\
                    menu_name VARCHAR(255), \
                    price_min DECIMAL(11), \
                    price_max DECIMAL(11), \
                    restaurant VARCHAR(255), \
                    PRIMARY KEY (menu_name, restaurant));')
+    
     cursor.execute('CREATE TABLE IF NOT EXISTS Post_Menu (\
                    post_id INT(11), \
                    menu_name VARCHAR(255), \
                    restaurant VARCHAR(255), \
                    PRIMARY KEY (post_id, menu_name, restaurant));')
+    
     cursor.execute('CREATE TABLE IF NOT EXISTS Post (\
                    post_id INT(11) PRIMARY KEY, \
                    blog_title VARCHAR(255), \
                    blog_URL VARCHAR(255), \
                    post_date DATETIME, \
                    restaurant VARCHAR(255));')
+    
     cursor.execute('CREATE TABLE IF NOT EXISTS Restaurant (\
                    restaurant_id VARCHAR(255) PRIMARY KEY, \
                    restaurant_name VARCHAR(255) NOT NULL, \
@@ -67,7 +72,11 @@ def requirement2(host, user, password):
                    dinner_price_min DECIMAL(11), \
                    dinner_price_max DECIMAL(11), \
                    location INT(11) NOT NULL, \
-                   category INT(11) NOT NULL);')
+                   category INT(11) NOT NULL, \
+                   mean_review_score DECIMAL(11) DEFAULT 0, \
+                   num_reviews INT(11) DEFAULT 0, \
+                   num_collection INT(11) DEFAULT 0);')
+    
     cursor.execute('CREATE TABLE IF NOT EXISTS Review (\
                    review_id INT(11) PRIMARY KEY, \
                    review_content LONGTEXT, \
@@ -78,10 +87,16 @@ def requirement2(host, user, password):
                    service_score INT(11), \
                    mood_score INT(11), \
                    restaurant VARCHAR(255));')
+    
     cursor.execute('CREATE TABLE IF NOT EXISTS User (\
                    user_id VARCHAR(255) PRIMARY KEY, \
                    user_name VARCHAR(255) NOT NULL, \
-                   region VARCHAR(255));')
+                   region VARCHAR(255), \
+                   num_reviews INT(11) DEFAULT 0, \
+                   num_followers INT(11) DEFAULT 0, \
+                   num_followees INT(11) DEFAULT 0, \
+                   num_collections INT(11) DEFAULT 0, \
+                   mean_review_score DECIMAL(11) DEFAULT 0);')
 
     cursor.close()
 
