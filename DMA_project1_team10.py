@@ -4,6 +4,7 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# TODO: REPLACE THE VALUE OF VARIABLE team (EX. TEAM 1 --> team = 1)
 team = 10
 
 
@@ -13,10 +14,11 @@ def requirement1(host, user, password):
     cursor = cnx.cursor()
     cursor.execute('SET GLOBAL innodb_buffer_pool_size=2*1024*1024*1024;')
     print('Creating schema...')
-
+    
+    # TODO: WRITE CODE HERE
     cursor.execute(f'CREATE DATABASE IF NOT EXISTS DMA_team{str(team)};')
     cursor.execute(f'USE DMA_team{str(team)};')
-
+    # TODO: WRITE CODE HERE
     cursor.close()
 
 
@@ -26,14 +28,13 @@ def requirement2(host, user, password):
     cursor = cnx.cursor()
     cursor.execute('SET GLOBAL innodb_buffer_pool_size=2*1024*1024*1024;')
     print('Creating tables...')
-
+    
+    # TODO: WRITE CODE HERE
     cursor.execute(f'USE DMA_team{str(team)};')
 
     cursor.execute('CREATE TABLE IF NOT EXISTS Category (\
                    category_id INT(11) PRIMARY KEY, \
-                   name VARCHAR(255) NOT NULL) \
-                   num_restaurants INT(11) DEFAULT 0);')
-    
+                   name VARCHAR(255));')
     cursor.execute('CREATE TABLE IF NOT EXISTS Collection (\
                    user_id VARCHAR(255), \
                    restaurant_id VARCHAR(255), \
@@ -41,9 +42,7 @@ def requirement2(host, user, password):
     
     cursor.execute('CREATE TABLE IF NOT EXISTS Location (\
                    location_id INT(11) PRIMARY KEY, \
-                   name VARCHAR(255) NOT NULL, \
-                   num_restaurants INT(11) DEFAULT 0);')
-    
+                   name VARCHAR(255));')
     cursor.execute('CREATE TABLE IF NOT EXISTS Menu (\
                    menu_name VARCHAR(255), \
                    price_min DECIMAL(11), \
@@ -66,22 +65,18 @@ def requirement2(host, user, password):
     
     cursor.execute('CREATE TABLE IF NOT EXISTS Restaurant (\
                    restaurant_id VARCHAR(255) PRIMARY KEY, \
-                   restaurant_name VARCHAR(255) NOT NULL, \
+                   restaurant_name VARCHAR(255), \
                    lunch_price_min DECIMAL(11), \
                    lunch_price_max DECIMAL(11), \
                    dinner_price_min DECIMAL(11), \
                    dinner_price_max DECIMAL(11), \
-                   location INT(11) NOT NULL, \
-                   category INT(11) NOT NULL, \
-                   mean_review_score DECIMAL(11) DEFAULT 0, \
-                   num_reviews INT(11) DEFAULT 0, \
-                   num_collection INT(11) DEFAULT 0);')
-    
+                   location INT(11), \
+                   category INT(11));')
     cursor.execute('CREATE TABLE IF NOT EXISTS Review (\
                    review_id INT(11) PRIMARY KEY, \
                    review_content LONGTEXT, \
                    reg_date DATETIME, \
-                   user_id VARCHAR(255) NOT NULL, \
+                   user_id VARCHAR(255), \
                    total_score INT(11), \
                    taste_score INT(11), \
                    service_score INT(11), \
@@ -90,14 +85,9 @@ def requirement2(host, user, password):
     
     cursor.execute('CREATE TABLE IF NOT EXISTS User (\
                    user_id VARCHAR(255) PRIMARY KEY, \
-                   user_name VARCHAR(255) NOT NULL, \
-                   region VARCHAR(255), \
-                   num_reviews INT(11) DEFAULT 0, \
-                   num_followers INT(11) DEFAULT 0, \
-                   num_followees INT(11) DEFAULT 0, \
-                   num_collections INT(11) DEFAULT 0, \
-                   mean_review_score DECIMAL(11) DEFAULT 0);')
-
+                   user_name VARCHAR(255), \
+                   region VARCHAR(255));')
+    # TODO: WRITE CODE HERE
     cursor.close()
 
 
@@ -108,6 +98,10 @@ def requirement3(host, user, password, directory):
     cursor.execute('SET GLOBAL innodb_buffer_pool_size=2*1024*1024*1024;')
     print('Inserting data...')
 
+    files = ['Category.csv', 'Collection.csv', 'Follow.csv', 'Location.csv', 'Menu.csv', 'Post_Menu.csv', 'Post.csv' 'Restaurant.csv' 'Review.csv', 'User.csv']
+    
+    # TODO: WRITE CODE HERE
+    # if string directory does not contain BASE_DIR, add BASE_DIR to directory
     if BASE_DIR not in directory:
         directory = os.path.join(BASE_DIR, directory)
 
@@ -165,6 +159,7 @@ def requirement3(host, user, password, directory):
         for row in reader:
             cursor.execute('INSERT INTO User (user_id, user_name, region) VALUES (%s, %s, %s);', row)
 
+    # TODO: WRITE CODE HERE
     cursor.close()
 
 
@@ -174,7 +169,8 @@ def requirement4(host, user, password):
     cursor = cnx.cursor()
     cursor.execute('SET GLOBAL innodb_buffer_pool_size=2*1024*1024*1024;')
     print('Adding constraints...')
-
+    
+    # TODO: WRITE CODE HERE
     cursor.execute(f'USE DMA_team{str(team)};')
     # Foreign key constraints
     cursor.execute('ALTER TABLE Collection ADD FOREIGN KEY (user_id) REFERENCES User(user_id);')
@@ -190,10 +186,11 @@ def requirement4(host, user, password):
     cursor.execute('ALTER TABLE Restaurant ADD FOREIGN KEY (category) REFERENCES Category(category_id);')
     cursor.execute('ALTER TABLE Review ADD FOREIGN KEY (user_id) REFERENCES User(user_id);')
     cursor.execute('ALTER TABLE Review ADD FOREIGN KEY (restaurant) REFERENCES Restaurant(restaurant_id);')
-
+    # TODO: WRITE CODE HERE
     cursor.close()
 
 
+# TODO: REPLACE THE VALUES OF FOLLOWING VARIABLES
 host = 'localhost'
 user = 'root'
 pwpath = os.path.join(BASE_DIR, 'password.txt')
