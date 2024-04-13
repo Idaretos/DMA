@@ -1,4 +1,4 @@
-import mysql.connector # type: ignore
+import mysql.connector
 import csv
 
 # TODO: REPLACE THE VALUE OF VARIABLE team (EX. TEAM 1 --> team = 1)
@@ -53,7 +53,7 @@ def requirement2(host, user, password):
                    restaurant VARCHAR(255), \
                    PRIMARY KEY (menu_name, restaurant));')
     
-    cursor.execute('CREATE TABLE IF NOT EXISTS Restaurant_Post (\
+    cursor.execute('CREATE TABLE IF NOT EXISTS Posted_On (\
                    post_id INT(11), \
                    menu_name VARCHAR(255), \
                    restaurant VARCHAR(255), \
@@ -239,7 +239,7 @@ def requirement3(host, user, password, directory):
         reader = csv.reader(f)
         next(reader)
         for row in reader:
-            cursor.execute('INSERT INTO Restaurant_Post (post_id, menu_name, restaurant) VALUES (%s, %s, %s);', row)
+            cursor.execute('INSERT INTO Posted_On (post_id, menu_name, restaurant) VALUES (%s, %s, %s);', row)
 
     # Save all changes
     cnx.commit()
@@ -263,9 +263,9 @@ def requirement4(host, user, password):
     cursor.execute('ALTER TABLE Follow ADD FOREIGN KEY (follower_id) REFERENCES User(user_id);')
     cursor.execute('ALTER TABLE Follow ADD FOREIGN KEY (followee_id) REFERENCES User(user_id);')
     cursor.execute('ALTER TABLE Menu ADD FOREIGN KEY (restaurant) REFERENCES Restaurant(restaurant_id);')
-    cursor.execute('ALTER TABLE Restaurant_Post ADD FOREIGN KEY (post_id) REFERENCES Post(post_id);')
-    cursor.execute('ALTER TABLE Restaurant_Post ADD FOREIGN KEY (menu_name) REFERENCES Menu(menu_name);')
-    cursor.execute('ALTER TABLE Restaurant_Post ADD FOREIGN KEY (restaurant) REFERENCES Restaurant(restaurant_id);')
+    cursor.execute('ALTER TABLE Posted_On ADD FOREIGN KEY (post_id) REFERENCES Post(post_id);')
+    cursor.execute('ALTER TABLE Posted_On ADD FOREIGN KEY (menu_name) REFERENCES Menu(menu_name);')
+    cursor.execute('ALTER TABLE Posted_On ADD FOREIGN KEY (restaurant) REFERENCES Restaurant(restaurant_id);')
     cursor.execute('ALTER TABLE Post ADD FOREIGN KEY (restaurant) REFERENCES Restaurant(restaurant_id);')
     cursor.execute('ALTER TABLE Restaurant ADD FOREIGN KEY (location) REFERENCES Location(location_id);')
     cursor.execute('ALTER TABLE Restaurant ADD FOREIGN KEY (category) REFERENCES Category(category_id);')
