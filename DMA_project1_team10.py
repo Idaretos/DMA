@@ -205,7 +205,6 @@ def requirement3(host, user, password, directory):
         next(reader)
         for row in reader:
             cursor.execute('INSERT INTO Restaurant (restaurant_id, restaurant_name, lunch_price_min, lunch_price_max, dinner_price_min, dinner_price_max, location, category) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);', row)
-    
     with open(directory + 'Collection.csv', 'r') as f:
         reader = csv.reader(f)
         next(reader)
@@ -224,10 +223,15 @@ def requirement3(host, user, password, directory):
             taste_score = row[5] if len(row[5]) else None
             service_score = row[6] if len(row[6]) else None
             mood_score = row[7] if len(row[7]) else None
-            if taste_score is not None and service_score is not None and mood_score is not None:
+            if taste_score is None:
+                taste_score = 0
+            if service_score is None:
+                service_score = 0
+            if mood_score is None:
+                mood_score = 0
+            if total_score is None:
                 total_score = (float(taste_score) + float(service_score) + float(mood_score)) / 3
-
-            cursor.execute('INSERT INTO Review (review_id, review_content, reg_date, user_id, total_score, taste_score, service_score, mood_score, restaurant) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);', row)
+            cursor.execute('INSERT INTO Review (review_id, review_content, reg_date, user_id, total_score, taste_score, service_score, mood_score, restaurant) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);', (row[0], row[1], row[2], row[3], total_score, taste_score, service_score, mood_score, row[8]))
     with open(directory + 'Menu.csv', 'r') as f:
         reader = csv.reader(f)
         next(reader)
