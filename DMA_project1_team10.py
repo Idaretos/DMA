@@ -42,7 +42,7 @@ def requirement2(host, user, password):
     
     cursor.execute('CREATE TABLE IF NOT EXISTS Location (\
                    location_id INT(11) PRIMARY KEY, \
-                   name VARCHAR(255), \
+                   name VARCHAR(255) NOT NULL, \
                    num_restaurants INT(11) DEFAULT 0);')
     
     cursor.execute('CREATE TABLE IF NOT EXISTS Menu (\
@@ -60,10 +60,10 @@ def requirement2(host, user, password):
     
     cursor.execute('CREATE TABLE IF NOT EXISTS Post (\
                    post_id INT(11) PRIMARY KEY, \
-                   blog_title VARCHAR(255), \
-                   blog_URL VARCHAR(255), \
-                   post_date DATETIME, \
-                   restaurant VARCHAR(255));')
+                   blog_title VARCHAR(255) NOT NULL, \
+                   blog_URL VARCHAR(255) NOT NULL, \
+                   post_date DATETIME NOT NULL, \
+                   restaurant VARCHAR(255) NOT NULL);')
     
     cursor.execute('CREATE TABLE IF NOT EXISTS Restaurant (\
                    restaurant_id VARCHAR(255) PRIMARY KEY, \
@@ -87,7 +87,7 @@ def requirement2(host, user, password):
                    taste_score DECIMAL(11,1) DEFAULT 0.0, \
                    service_score DECIMAL(11,1) DEFAULT 0.0, \
                    mood_score DECIMAL(11,1) DEFAULT 0.0, \
-                   restaurant VARCHAR(255));')
+                   restaurant VARCHAR(255) NOT NULL);')
     
     cursor.execute('CREATE TABLE IF NOT EXISTS User (\
                    user_id VARCHAR(255) PRIMARY KEY, \
