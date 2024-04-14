@@ -42,7 +42,9 @@ def requirement2(host, user, password):
     
     cursor.execute('CREATE TABLE IF NOT EXISTS Location (\
                    location_id INT(11) PRIMARY KEY, \
-                   name VARCHAR(255));')
+                   name VARCHAR(255), \
+                   num_restaurants INT(11) DEFAULT 0);')
+    
     cursor.execute('CREATE TABLE IF NOT EXISTS Menu (\
                    menu_name VARCHAR(255), \
                    price_min INT(11), \
@@ -81,10 +83,10 @@ def requirement2(host, user, password):
                    review_content LONGTEXT, \
                    reg_date DATETIME, \
                    user_id VARCHAR(255) NOT NULL, \
-                   total_score DECIMAL(11,1), \
-                   taste_score DECIMAL(11,1), \
-                   service_score DECIMAL(11,1), \
-                   mood_score DECIMAL(11,1), \
+                   total_score DECIMAL(11,1) NOT NULL, \
+                   taste_score DECIMAL(11,1) DEFAULT 0.0, \
+                   service_score DECIMAL(11,1) DEFAULT 0.0, \
+                   mood_score DECIMAL(11,1) DEFAULT 0.0, \
                    restaurant VARCHAR(255));')
     
     cursor.execute('CREATE TABLE IF NOT EXISTS User (\
@@ -218,6 +220,13 @@ def requirement3(host, user, password, directory):
         reader = csv.reader(f)
         next(reader)
         for row in reader:
+            total_score = row[4] if len(row[4]) else None
+            taste_score = row[5] if len(row[5]) else None
+            service_score = row[6] if len(row[6]) else None
+            mood_score = row[7] if len(row[7]) else None
+            if taste_score is not None and service_score is not None and mood_score is not None:
+                total_score = (float(taste_score) + float(service_score) + float(mood_score)) / 3
+
             cursor.execute('INSERT INTO Review (review_id, review_content, reg_date, user_id, total_score, taste_score, service_score, mood_score, restaurant) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);', row)
     with open(directory + 'Menu.csv', 'r') as f:
         reader = csv.reader(f)
